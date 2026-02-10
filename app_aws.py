@@ -85,7 +85,11 @@ def send_metric(metric_name, value, unit='Count'):
 def index():
     if 'session_token' in session:
         return redirect(url_for('dashboard'))
-    return redirect(url_for('login'))
+    return render_template('home.html')
+
+@application.route('/home')
+def home():
+    return render_template('home.html')
 
 @application.route('/register', methods=['GET', 'POST'])
 def register():
@@ -94,7 +98,7 @@ def register():
         result = auth_service.register_user(data['email'], data['password'])
         send_metric('UserRegistration', 1 if result['success'] else 0)
         return jsonify(result)
-    return render_template('signup.html')
+    return render_template('register.html')
 
 @application.route('/login', methods=['GET', 'POST'])
 def login():
@@ -118,7 +122,7 @@ def logout():
 @application.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('home.html')
+    return render_template('dashboard.html')
 
 @application.route('/api/prices')
 @login_required
@@ -199,7 +203,7 @@ def not_found(error):
 
 @application.errorhandler(500)
 def internal_error(error):
-    return render_template('500.html'), 500
+    return jsonify({'error': 'Internal server error'}), 500
 
 if __name__ == '__main__':
     application.run(debug=False, host='0.0.0.0', port=5000)
