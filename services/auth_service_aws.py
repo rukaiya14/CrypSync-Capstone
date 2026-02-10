@@ -44,7 +44,7 @@ class AuthServiceAWS:
                 }
             )
             
-            return {'success': True, 'user_id': user_id, 'message': 'User registered successfully'}
+            return {'success': True, 'user_id': email, 'message': 'User registered successfully'}
         
         except Exception as e:
             return {'success': False, 'error': 'REGISTRATION_FAILED', 'message': str(e)}
@@ -76,7 +76,7 @@ class AuthServiceAWS:
             
             # Create JWT token
             session_token = jwt.encode({
-                'user_id': user['user_id'],
+                'user_id': email,  # Use email as user_id
                 'email': email,
                 'exp': datetime.utcnow() + timedelta(hours=24),
                 'iat': datetime.utcnow()
@@ -84,14 +84,14 @@ class AuthServiceAWS:
             
             # Cache session
             self.sessions[session_token] = {
-                'user_id': user['user_id'],
+                'user_id': email,  # Use email as user_id
                 'email': email
             }
             
             return {
                 'success': True,
                 'session_token': session_token,
-                'user_id': user['user_id'],
+                'user_id': email,  # Use email as user_id
                 'email': email,
                 'message': 'Login successful'
             }
