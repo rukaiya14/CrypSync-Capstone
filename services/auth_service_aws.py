@@ -11,7 +11,7 @@ from decimal import Decimal
 class AuthServiceAWS:
     def __init__(self, dynamodb):
         self.dynamodb = dynamodb
-        self.table_name = os.getenv('DYNAMODB_USERS_TABLE', 'crypsync-users-production')
+        self.table_name = os.getenv('DYNAMODB_USERS_TABLE', 'Users_New')
         self.table = dynamodb.Table(self.table_name)
         self.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key')
         self.sessions = {}  # In-memory session cache
@@ -19,8 +19,11 @@ class AuthServiceAWS:
     def register_user(self, email, password):
         """Register a new user"""
         try:
-            # Check if user exists using direct get_item (email is primary key)
-            response = self.table.get_item(Key={'email': email})
+            # Generate username from email (before @ symbol)
+            username = email.split('@')[0]
+            
+            # Check if user exists (email is partition key, username is sort key)
+            response = self.table.get_item(Key={'email': email, 'username': username})
             
             if 'Item' in response:
                 return {'success': False, 'error': 'USER_EXISTS', 'message': 'User already exists'}
@@ -28,11 +31,12 @@ class AuthServiceAWS:
             # Hash password
             password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(12)).decode('utf-8')
             
-            # Create user with email as primary key
+            # Create user with email as partition key and username as sort key
             user_id = str(uuid.uuid4())
             self.table.put_item(
                 Item={
-                    'email': email,  # Primary partition key
+                    'email': email,  # Partition key
+                    'username': username,  # Sort key
                     'user_id': user_id,
                     'password_hash': password_hash,
                     'created_at': datetime.utcnow().isoformat(),
@@ -48,8 +52,11 @@ class AuthServiceAWS:
     def authenticate_user(self, email, password):
         """Authenticate user and create session"""
         try:
-            # Get user by email (primary key)
-            response = self.table.get_item(Key={'email': email})
+            # Generate username from email
+            username = email.split('@')[0]
+            
+            # Get user by email and username (composite key)
+            response = self.table.get_item(Key={'email': email, 'username': username})
             
             if 'Item' not in response:
                 return {'success': False, 'error': 'INVALID_CREDENTIALS', 'message': 'Invalid email or password'}
@@ -62,7 +69,7 @@ class AuthServiceAWS:
             
             # Update last login
             self.table.update_item(
-                Key={'email': email},
+                Key={'email': email, 'username': username},
                 UpdateExpression='SET last_login = :login_time',
                 ExpressionAttributeValues={':login_time': datetime.utcnow().isoformat()}
             )
