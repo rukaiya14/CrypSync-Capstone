@@ -195,7 +195,62 @@ def get_portfolio():
     try:
         user_id = session['user_id']
         result = portfolio_service.get_user_portfolio(user_id)
-        return jsonify(result)
+        
+        if not result['success']:
+            return jsonify(result)
+        
+        # Get current prices for all holdings
+        holdings = result.get('holdings', [])
+        if holdings:
+            crypto_ids = [h['crypto_id'] for h in holdings]
+            price_result = price_service.get_current_prices(crypto_ids)
+            
+            if price_result['success']:
+                current_prices = price_result['data']
+                
+                # Calculate portfolio value
+                total_value = 0
+                holdings_with_prices = []
+                
+                for holding in holdings:
+                    crypto_id = holding['crypto_id']
+                    if crypto_id in current_prices:
+                        current_price = current_prices[crypto_id]['price_usd']
+                        current_value = holding['total_amount'] * current_price
+                        profit_loss = current_value - holding['total_invested']
+                        profit_loss_pct = (profit_loss / holding['total_invested'] * 100) if holding['total_invested'] > 0 else 0
+                        
+                        holdings_with_prices.append({
+                            'crypto_id': crypto_id,
+                            'amount': holding['total_amount'],
+                            'avg_price': holding['avg_buy_price'],
+                            'current_price': current_price,
+                            'current_value': current_value,
+                            'total_invested': holding['total_invested'],
+                            'profit_loss': profit_loss,
+                            'profit_loss_pct': profit_loss_pct
+                        })
+                        
+                        total_value += current_value
+                
+                return jsonify({
+                    'success': True,
+                    'portfolio': {h['crypto_id']: h for h in holdings_with_prices},
+                    'portfolio_value': {
+                        'total_value': total_value,
+                        'holdings': holdings_with_prices
+                    },
+                    'transactions': result.get('transactions', [])
+                })
+        
+        # Empty portfolio
+        return jsonify({
+            'success': True,
+            'portfolio': {},
+            'portfolio_value': {'total_value': 0, 'holdings': []},
+            'transactions': []
+        })
+        
     except Exception as e:
         print(f"Portfolio fetch error: {str(e)}")
         import traceback
@@ -209,7 +264,7 @@ def buy_crypto():
     data = request.get_json()
     
     # Get price from request or fetch current price
-    price = data.get('price') or data.get('purchase_price')
+    price = data.get('price') or data.get('purchase_price') or data.get('price_usd')
     if not price:
         # Fetch current price if not provided
         crypto_id = data['crypto_id']
