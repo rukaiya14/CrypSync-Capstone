@@ -9,7 +9,7 @@ import time
 class HistoricalServiceAWS:
     def __init__(self, dynamodb):
         self.dynamodb = dynamodb
-        self.table_name = os.getenv('DYNAMODB_PRICES_TABLE', 'crypsync-prices-production')
+        self.table_name = os.getenv('DYNAMODB_PRICES_TABLE', 'CryptoPrices')
         self.table = dynamodb.Table(self.table_name)
         self.cache = {}
     
@@ -24,8 +24,8 @@ class HistoricalServiceAWS:
             
             self.table.put_item(
                 Item={
-                    'crypto_id': crypto_id,
-                    'timestamp': int(timestamp.timestamp()),
+                    'CryptoTicker': crypto_id,  # Partition key
+                    'Timestamp': Decimal(str(int(timestamp.timestamp()))),  # Sort key (Number)
                     'price_usd': Decimal(str(price)),
                     'recorded_at': timestamp.isoformat(),
                     'source': 'coingecko',
@@ -46,8 +46,8 @@ class HistoricalServiceAWS:
             start_timestamp = int(start_date.timestamp())
             
             response = self.table.query(
-                KeyConditionExpression='crypto_id = :cid AND #ts >= :start',
-                ExpressionAttributeNames={'#ts': 'timestamp'},
+                KeyConditionExpression='CryptoTicker = :cid AND #ts >= :start',
+                ExpressionAttributeNames={'#ts': 'Timestamp'},
                 ExpressionAttributeValues={
                     ':cid': crypto_id,
                     ':start': start_timestamp
@@ -58,9 +58,9 @@ class HistoricalServiceAWS:
             data = []
             for item in response['Items']:
                 data.append({
-                    'crypto_id': item['crypto_id'],
+                    'crypto_id': item['CryptoTicker'],
                     'price_usd': float(item['price_usd']),
-                    'timestamp': datetime.fromtimestamp(item['timestamp']),
+                    'timestamp': datetime.fromtimestamp(int(item['Timestamp'])),
                     'recorded_at': item['recorded_at'],
                     'source': item.get('source', 'coingecko')
                 })

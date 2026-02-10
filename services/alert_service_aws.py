@@ -9,7 +9,7 @@ import os
 class AlertServiceAWS:
     def __init__(self, dynamodb):
         self.dynamodb = dynamodb
-        self.table_name = os.getenv('DYNAMODB_ALERTS_TABLE', 'crypsync-alerts-production')
+        self.table_name = os.getenv('DYNAMODB_ALERTS_TABLE', 'PriceAlerts')
         self.table = dynamodb.Table(self.table_name)
     
     def create_alert(self, user_id, crypto_id, threshold, alert_type):
@@ -19,8 +19,8 @@ class AlertServiceAWS:
             
             self.table.put_item(
                 Item={
-                    'user_id': user_id,
-                    'alert_id': alert_id,
+                    'AlertID': alert_id,  # Partition key
+                    'UserID': user_id,    # Sort key
                     'crypto_id': crypto_id,
                     'threshold': Decimal(str(threshold)),
                     'alert_type': alert_type,
@@ -47,10 +47,10 @@ class AlertServiceAWS:
             return {'success': False, 'error': 'ALERT_CREATION_FAILED', 'message': str(e)}
     
     def get_user_alerts(self, user_id):
-        """Get all alerts for a user"""
+        """Get all alerts for a user - scan with filter since UserID is sort key"""
         try:
-            response = self.table.query(
-                KeyConditionExpression='user_id = :uid',
+            response = self.table.scan(
+                FilterExpression='UserID = :uid',
                 ExpressionAttributeValues={':uid': user_id}
             )
             
@@ -60,6 +60,9 @@ class AlertServiceAWS:
                 alert = dict(item)
                 if 'threshold' in alert:
                     alert['threshold'] = float(alert['threshold'])
+                # Normalize keys for frontend
+                alert['alert_id'] = alert.get('AlertID')
+                alert['user_id'] = alert.get('UserID')
                 alerts.append(alert)
             
             return {'success': True, 'alerts': alerts}
@@ -72,8 +75,8 @@ class AlertServiceAWS:
         try:
             self.table.delete_item(
                 Key={
-                    'user_id': user_id,
-                    'alert_id': alert_id
+                    'AlertID': alert_id,
+                    'UserID': user_id
                 }
             )
             
@@ -87,10 +90,9 @@ class AlertServiceAWS:
         triggered_alerts = []
         
         try:
-            # Query all active alerts
-            response = self.table.query(
-                IndexName='state-index',
-                KeyConditionExpression='#state = :active',
+            # Scan for all active alerts
+            response = self.table.scan(
+                FilterExpression='#state = :active',
                 ExpressionAttributeNames={'#state': 'state'},
                 ExpressionAttributeValues={':active': 'ACTIVE'}
             )
@@ -114,8 +116,8 @@ class AlertServiceAWS:
                     # Update alert state
                     self.table.update_item(
                         Key={
-                            'user_id': alert['user_id'],
-                            'alert_id': alert['alert_id']
+                            'AlertID': alert['AlertID'],
+                            'UserID': alert['UserID']
                         },
                         UpdateExpression='SET #state = :triggered, last_triggered = :time',
                         ExpressionAttributeNames={'#state': 'state'},
@@ -128,7 +130,7 @@ class AlertServiceAWS:
                     triggered_alerts.append({
                         'alert': alert,
                         'current_price': float(current_price),
-                        'user_id': alert['user_id']
+                        'user_id': alert['UserID']
                     })
             
             return triggered_alerts
