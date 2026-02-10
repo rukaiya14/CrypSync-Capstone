@@ -34,6 +34,7 @@ from services.historical_service_aws import HistoricalServiceAWS
 from services.visualization_service import VisualizationService
 from services.notification_service import NotificationService
 from services.portfolio_service_aws import PortfolioServiceAWS
+from services.admin_service_aws import AdminServiceAWS
 
 # Initialize Flask app
 application = Flask(__name__)
@@ -52,6 +53,7 @@ historical_service = HistoricalServiceAWS(dynamodb)
 visualization_service = VisualizationService()
 notification_service = NotificationService(ses)
 portfolio_service = PortfolioServiceAWS(dynamodb)
+admin_service = AdminServiceAWS(dynamodb)
 
 # Authentication decorator
 def login_required(f):
@@ -408,6 +410,30 @@ def analyst_dashboard():
 @login_required
 def admin_dashboard():
     return render_template('admin_dashboard.html')
+
+@application.route('/api/admin/stats')
+@login_required
+def admin_stats():
+    result = admin_service.get_dashboard_stats()
+    return jsonify(result)
+
+@application.route('/api/admin/users')
+@login_required
+def admin_users():
+    result = admin_service.get_all_users()
+    return jsonify(result)
+
+@application.route('/api/admin/transactions')
+@login_required
+def admin_transactions():
+    result = admin_service.get_all_transactions()
+    return jsonify(result)
+
+@application.route('/api/admin/alerts')
+@login_required
+def admin_alerts_list():
+    result = admin_service.get_all_alerts()
+    return jsonify(result)
 
 @application.route('/health')
 def health():

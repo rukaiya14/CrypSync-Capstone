@@ -562,3 +562,96 @@
     }, 30000);
 </script>
 {% endblock %}
+
+
+{% block extra_js %}
+<script>
+    // Load dashboard stats
+    async function loadStats() {
+        try {
+            const response = await fetch('/api/admin/stats');
+            const data = await response.json();
+
+            if (data.success) {
+                document.getElementById('totalUsers').textContent = data.stats.total_users;
+                document.getElementById('totalTransactions').textContent = data.stats.total_transactions;
+                document.getElementById('portfolioValue').textContent = '$' + data.stats.portfolio_value.toLocaleString('en-US', { minimumFractionDigits: 2 });
+                document.getElementById('activeAlerts').textContent = data.stats.active_alerts;
+            }
+        } catch (error) {
+            console.error('Failed to load stats:', error);
+        }
+    }
+
+    // Load users
+    async function loadUsers() {
+        try {
+            const response = await fetch('/api/admin/users');
+            const data = await response.json();
+
+            if (data.success) {
+                const tbody = document.querySelector('#usersTable tbody');
+                tbody.innerHTML = '';
+
+                data.users.forEach(user => {
+                    const row = `
+                    <tr>
+                        <td>${user.email}</td>
+                        <td>${user.username || 'N/A'}</td>
+                        <td>${user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</td>
+                        <td>${user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}</td>
+                        <td><span class="badge bg-success">Active</span></td>
+                    </tr>
+                `;
+                    tbody.innerHTML += row;
+                });
+            }
+        } catch (error) {
+            console.error('Failed to load users:', error);
+        }
+    }
+
+    // Load transactions
+    async function loadTransactions() {
+        try {
+            const response = await fetch('/api/admin/transactions');
+            const data = await response.json();
+
+            if (data.success) {
+                const tbody = document.querySelector('#transactionsTable tbody');
+                tbody.innerHTML = '';
+
+                data.transactions.slice(0, 20).forEach(tx => {
+                    const typeClass = tx.transaction_type === 'BUY' ? 'success' : 'danger';
+                    const row = `
+                    <tr>
+                        <td>${tx.email}</td>
+                        <td>${tx.crypto_id.toUpperCase()}</td>
+                        <td><span class="badge bg-${typeClass}">${tx.transaction_type}</span></td>
+                        <td>${tx.amount.toFixed(8)}</td>
+                        <td>$${tx.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                        <td>$${tx.total.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                        <td>${tx.timestamp ? new Date(tx.timestamp).toLocaleString() : 'N/A'}</td>
+                    </tr>
+                `;
+                    tbody.innerHTML += row;
+                });
+            }
+        } catch (error) {
+            console.error('Failed to load transactions:', error);
+        }
+    }
+
+    // Initial load
+    loadStats();
+    loadUsers();
+    loadTransactions();
+
+    // Auto-refresh every 30 seconds
+    setInterval(() => {
+        loadStats();
+        loadUsers();
+        loadTransactions();
+    }, 30000);
+</script>
+{% endblock %}
