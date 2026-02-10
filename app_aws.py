@@ -12,6 +12,18 @@ from botocore.exceptions import ClientError
 # Load environment variables
 load_dotenv()
 
+# --- Initialize AWS services ---
+# Use os.getenv to keep your code flexible for Scenario 3 (Scalability)
+SNS_TOPIC_ARN = os.getenv('SNS_TOPIC_ARN')
+USERS_TABLE = os.getenv('DYNAMODB_USERS_TABLE', 'Users')
+PRICES_TABLE = os.getenv('DYNAMODB_PRICES_TABLE', 'CryptoPrices')
+ALERTS_TABLE = os.getenv('DYNAMODB_ALERTS_TABLE', 'PriceAlerts')
+
+# Initialize Clients and Resources
+dynamodb = boto3.resource('dynamodb', region_name=os.getenv('AWS_REGION', 'us-east-1'))
+sns_client = boto3.client('sns', region_name=os.getenv('AWS_REGION', 'us-east-1'))
+cloudwatch = boto3.client('cloudwatch', region_name=os.getenv('AWS_REGION', 'us-east-1'))
+
 # Import services
 from services.auth_service_aws import AuthServiceAWS
 from services.price_service import PriceService
@@ -190,4 +202,4 @@ def internal_error(error):
     return render_template('500.html'), 500
 
 if __name__ == '__main__':
-    application.run(debug=False, host='0.0.0.0', port=8080)
+    application.run(debug=False, host='0.0.0.0', port=5000)
