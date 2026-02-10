@@ -41,6 +41,11 @@
                             <i class="fas fa-tachometer-alt"></i> Dashboard
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('historical') }}">
+                            <i class="fas fa-chart-area"></i> Historical
+                        </a>
+                    </li>
                     {% if session.get('role') == 'user' or not session.get('role') %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('trading') }}">
@@ -67,11 +72,6 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('analyst_dashboard') }}">
                             <i class="fas fa-chart-bar"></i> Analysis
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('historical') }}">
-                            <i class="fas fa-chart-area"></i> Historical
                         </a>
                     </li>
                     {% endif %}
