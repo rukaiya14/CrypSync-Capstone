@@ -19,25 +19,21 @@ class AuthServiceAWS:
     def register_user(self, email, password):
         """Register a new user"""
         try:
-            # Check if user exists using GSI
-            response = self.table.query(
-                IndexName='email-index',
-                KeyConditionExpression='email = :email',
-                ExpressionAttributeValues={':email': email}
-            )
+            # Check if user exists using direct get_item (email is primary key)
+            response = self.table.get_item(Key={'email': email})
             
-            if response['Items']:
+            if 'Item' in response:
                 return {'success': False, 'error': 'USER_EXISTS', 'message': 'User already exists'}
             
             # Hash password
             password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(12)).decode('utf-8')
             
-            # Create user
+            # Create user with email as primary key
             user_id = str(uuid.uuid4())
             self.table.put_item(
                 Item={
+                    'email': email,  # Primary partition key
                     'user_id': user_id,
-                    'email': email,
                     'password_hash': password_hash,
                     'created_at': datetime.utcnow().isoformat(),
                     'last_login': None
@@ -52,17 +48,13 @@ class AuthServiceAWS:
     def authenticate_user(self, email, password):
         """Authenticate user and create session"""
         try:
-            # Get user by email
-            response = self.table.query(
-                IndexName='email-index',
-                KeyConditionExpression='email = :email',
-                ExpressionAttributeValues={':email': email}
-            )
+            # Get user by email (primary key)
+            response = self.table.get_item(Key={'email': email})
             
-            if not response['Items']:
+            if 'Item' not in response:
                 return {'success': False, 'error': 'INVALID_CREDENTIALS', 'message': 'Invalid email or password'}
             
-            user = response['Items'][0]
+            user = response['Item']
             
             # Verify password
             if not bcrypt.checkpw(password.encode('utf-8'), user['password_hash'].encode('utf-8')):
@@ -70,7 +62,7 @@ class AuthServiceAWS:
             
             # Update last login
             self.table.update_item(
-                Key={'user_id': user['user_id']},
+                Key={'email': email},
                 UpdateExpression='SET last_login = :login_time',
                 ExpressionAttributeValues={':login_time': datetime.utcnow().isoformat()}
             )
