@@ -9,6 +9,7 @@ import os
 from dotenv import load_dotenv
 import boto3
 from botocore.exceptions import ClientError
+from datetime import datetime
 
 # Load environment variables
 load_dotenv()
@@ -111,6 +112,7 @@ def login():
         if result['success']:
             session['session_token'] = result['session_token']
             session['user_id'] = result['user_id']
+            session['email'] = result['email']
             send_metric('UserLogin', 1)
         return jsonify(result)
     return render_template('login.html')
@@ -219,6 +221,32 @@ def buy_crypto():
         float(price)
     )
     
+    # Send SNS notification
+    if result['success']:
+        try:
+            user_email = session.get('email', 'user')
+            total_cost = float(data['amount']) * float(price)
+            message = f"""
+CrypSync Transaction Notification
+
+Transaction Type: BUY
+Cryptocurrency: {data['crypto_id'].upper()}
+Amount: {data['amount']}
+Price per unit: ${price:,.2f}
+Total Cost: ${total_cost:,.2f}
+User: {user_email}
+Time: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}
+
+Thank you for using CrypSync!
+"""
+            sns_client.publish(
+                TopicArn=SNS_TOPIC_ARN,
+                Subject=f'CrypSync: BUY {data["crypto_id"].upper()}',
+                Message=message
+            )
+        except Exception as e:
+            print(f"Failed to send SNS notification: {e}")
+    
     send_metric('CryptoPurchase', 1 if result['success'] else 0)
     return jsonify(result)
 
@@ -246,6 +274,32 @@ def sell_crypto():
         float(data['amount']),
         float(price)
     )
+    
+    # Send SNS notification
+    if result['success']:
+        try:
+            user_email = session.get('email', 'user')
+            total_revenue = float(data['amount']) * float(price)
+            message = f"""
+CrypSync Transaction Notification
+
+Transaction Type: SELL
+Cryptocurrency: {data['crypto_id'].upper()}
+Amount: {data['amount']}
+Price per unit: ${price:,.2f}
+Total Revenue: ${total_revenue:,.2f}
+User: {user_email}
+Time: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}
+
+Thank you for using CrypSync!
+"""
+            sns_client.publish(
+                TopicArn=SNS_TOPIC_ARN,
+                Subject=f'CrypSync: SELL {data["crypto_id"].upper()}',
+                Message=message
+            )
+        except Exception as e:
+            print(f"Failed to send SNS notification: {e}")
     
     send_metric('CryptoSale', 1 if result['success'] else 0)
     return jsonify(result)
