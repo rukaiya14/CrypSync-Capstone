@@ -15,16 +15,21 @@ class PortfolioServiceAWS:
     def get_user_portfolio(self, user_id):
         """Get all holdings for a user - user_id is email"""
         try:
+            print(f"DEBUG: Querying portfolio for user_id (email): {user_id}")
+            
             response = self.table.query(
                 KeyConditionExpression='email = :email',
                 ExpressionAttributeValues={':email': user_id}
             )
+            
+            print(f"DEBUG: Query returned {len(response.get('Items', []))} items")
             
             # Aggregate holdings by crypto_id
             holdings = {}
             transactions = []
             
             for item in response['Items']:
+                print(f"DEBUG: Processing item: {item}")
                 crypto_id = item.get('crypto_id')
                 transaction_type = item.get('transaction_type')
                 amount = float(item.get('amount', 0))
@@ -65,6 +70,8 @@ class PortfolioServiceAWS:
             # Filter out zero holdings
             holdings = {k: v for k, v in holdings.items() if v['total_amount'] > 0}
             
+            print(f"DEBUG: Final holdings: {holdings}")
+            
             return {
                 'success': True,
                 'holdings': list(holdings.values()),
@@ -72,12 +79,17 @@ class PortfolioServiceAWS:
             }
         
         except Exception as e:
+            print(f"ERROR: Portfolio fetch failed: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return {'success': False, 'error': 'PORTFOLIO_FETCH_FAILED', 'message': str(e)}
     
     def add_transaction(self, user_id, crypto_id, transaction_type, amount, price):
         """Add a buy or sell transaction - user_id is email"""
         try:
             transaction_id = str(uuid.uuid4())
+            
+            print(f"DEBUG: Adding transaction for email: {user_id}, crypto: {crypto_id}, type: {transaction_type}")
             
             self.table.put_item(
                 Item={
@@ -91,6 +103,8 @@ class PortfolioServiceAWS:
                     'timestamp': datetime.utcnow().isoformat()
                 }
             )
+            
+            print(f"DEBUG: Transaction added successfully with ID: {transaction_id}")
             
             return {
                 'success': True,
@@ -107,6 +121,9 @@ class PortfolioServiceAWS:
             }
         
         except Exception as e:
+            print(f"ERROR: Transaction failed: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return {'success': False, 'error': 'TRANSACTION_FAILED', 'message': str(e)}
     
     def delete_transaction(self, user_id, transaction_id):
