@@ -192,9 +192,15 @@ def get_historical():
 @application.route('/api/portfolio', methods=['GET'])
 @login_required
 def get_portfolio():
-    user_id = session['user_id']
-    result = portfolio_service.get_user_portfolio(user_id)
-    return jsonify(result)
+    try:
+        user_id = session['user_id']
+        result = portfolio_service.get_user_portfolio(user_id)
+        return jsonify(result)
+    except Exception as e:
+        print(f"Portfolio fetch error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': 'PORTFOLIO_ERROR', 'message': str(e)})
 
 @application.route('/api/portfolio/buy', methods=['POST'])
 @login_required
