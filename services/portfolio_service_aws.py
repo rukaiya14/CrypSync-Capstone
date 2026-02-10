@@ -13,11 +13,11 @@ class PortfolioServiceAWS:
         self.table = dynamodb.Table(self.table_name)
     
     def get_user_portfolio(self, user_id):
-        """Get all holdings for a user"""
+        """Get all holdings for a user - user_id is email"""
         try:
             response = self.table.query(
-                KeyConditionExpression='UserID = :uid',
-                ExpressionAttributeValues={':uid': user_id}
+                KeyConditionExpression='email = :email',
+                ExpressionAttributeValues={':email': user_id}
             )
             
             # Aggregate holdings by crypto_id
@@ -75,14 +75,14 @@ class PortfolioServiceAWS:
             return {'success': False, 'error': 'PORTFOLIO_FETCH_FAILED', 'message': str(e)}
     
     def add_transaction(self, user_id, crypto_id, transaction_type, amount, price):
-        """Add a buy or sell transaction"""
+        """Add a buy or sell transaction - user_id is email"""
         try:
             transaction_id = str(uuid.uuid4())
             
             self.table.put_item(
                 Item={
-                    'UserID': user_id,
-                    'TransactionID': transaction_id,
+                    'email': user_id,  # Partition key (email)
+                    'TransactionID': transaction_id,  # Sort key
                     'crypto_id': crypto_id,
                     'transaction_type': transaction_type,
                     'amount': Decimal(str(amount)),
@@ -110,11 +110,11 @@ class PortfolioServiceAWS:
             return {'success': False, 'error': 'TRANSACTION_FAILED', 'message': str(e)}
     
     def delete_transaction(self, user_id, transaction_id):
-        """Delete a transaction"""
+        """Delete a transaction - user_id is email"""
         try:
             self.table.delete_item(
                 Key={
-                    'UserID': user_id,
+                    'email': user_id,
                     'TransactionID': transaction_id
                 }
             )
