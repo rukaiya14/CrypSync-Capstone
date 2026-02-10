@@ -200,12 +200,23 @@ def buy_crypto():
     user_id = session['user_id']
     data = request.get_json()
     
+    # Get price from request or fetch current price
+    price = data.get('price') or data.get('purchase_price')
+    if not price:
+        # Fetch current price if not provided
+        crypto_id = data['crypto_id']
+        price_result = price_service.get_current_prices([crypto_id])
+        if price_result['success'] and crypto_id in price_result['data']:
+            price = price_result['data'][crypto_id]['price_usd']
+        else:
+            return jsonify({'success': False, 'error': 'PRICE_NOT_FOUND', 'message': 'Could not determine price'})
+    
     result = portfolio_service.add_transaction(
         user_id,
         data['crypto_id'],
         'BUY',
         float(data['amount']),
-        float(data['price'])
+        float(price)
     )
     
     send_metric('CryptoPurchase', 1 if result['success'] else 0)
@@ -217,12 +228,23 @@ def sell_crypto():
     user_id = session['user_id']
     data = request.get_json()
     
+    # Get price from request or fetch current price
+    price = data.get('price') or data.get('sale_price')
+    if not price:
+        # Fetch current price if not provided
+        crypto_id = data['crypto_id']
+        price_result = price_service.get_current_prices([crypto_id])
+        if price_result['success'] and crypto_id in price_result['data']:
+            price = price_result['data'][crypto_id]['price_usd']
+        else:
+            return jsonify({'success': False, 'error': 'PRICE_NOT_FOUND', 'message': 'Could not determine price'})
+    
     result = portfolio_service.add_transaction(
         user_id,
         data['crypto_id'],
         'SELL',
         float(data['amount']),
-        float(data['price'])
+        float(price)
     )
     
     send_metric('CryptoSale', 1 if result['success'] else 0)
