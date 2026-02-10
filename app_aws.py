@@ -32,6 +32,7 @@ from services.alert_service_aws import AlertServiceAWS
 from services.historical_service_aws import HistoricalServiceAWS
 from services.visualization_service import VisualizationService
 from services.notification_service import NotificationService
+from services.portfolio_service_aws import PortfolioServiceAWS
 
 # Initialize Flask app
 application = Flask(__name__)
@@ -49,6 +50,7 @@ alert_service = AlertServiceAWS(dynamodb)
 historical_service = HistoricalServiceAWS(dynamodb)
 visualization_service = VisualizationService()
 notification_service = NotificationService(ses)
+portfolio_service = PortfolioServiceAWS(dynamodb)
 
 # Authentication decorator
 def login_required(f):
@@ -183,6 +185,47 @@ def get_historical():
     if result['success']:
         chart_data = visualization_service.prepare_chart_data(result['data'])
         return jsonify({'success': True, 'data': chart_data})
+    return jsonify(result)
+
+@application.route('/api/portfolio', methods=['GET'])
+@login_required
+def get_portfolio():
+    user_id = session['user_id']
+    result = portfolio_service.get_user_portfolio(user_id)
+    return jsonify(result)
+
+@application.route('/api/portfolio/buy', methods=['POST'])
+@login_required
+def buy_crypto():
+    user_id = session['user_id']
+    data = request.get_json()
+    
+    result = portfolio_service.add_transaction(
+        user_id,
+        data['crypto_id'],
+        'BUY',
+        float(data['amount']),
+        float(data['price'])
+    )
+    
+    send_metric('CryptoPurchase', 1 if result['success'] else 0)
+    return jsonify(result)
+
+@application.route('/api/portfolio/sell', methods=['POST'])
+@login_required
+def sell_crypto():
+    user_id = session['user_id']
+    data = request.get_json()
+    
+    result = portfolio_service.add_transaction(
+        user_id,
+        data['crypto_id'],
+        'SELL',
+        float(data['amount']),
+        float(data['price'])
+    )
+    
+    send_metric('CryptoSale', 1 if result['success'] else 0)
     return jsonify(result)
 
 @application.route('/charts')
