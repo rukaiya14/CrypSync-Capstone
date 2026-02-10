@@ -1,6 +1,7 @@
 """
 CrypSync - AWS Production Application
 Flask application configured for AWS Elastic Beanstalk deployment
+"""
 
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from functools import wraps
