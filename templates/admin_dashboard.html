@@ -1,0 +1,564 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - CrypSync{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        color: white;
+    }
+
+    .system-health-card {
+        background: #1a1a1a;
+        border-left: 4px solid #28a745;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .system-health-card.warning {
+        border-left-color: #ffc107;
+    }
+
+    .system-health-card.error {
+        border-left-color: #dc3545;
+    }
+
+    .activity-log {
+        background: #0d0d0d;
+        border: 1px solid #2d2d2d;
+        border-radius: 8px;
+        padding: 1rem;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .log-entry {
+        padding: 0.5rem;
+        border-bottom: 1px solid #2d2d2d;
+        font-size: 0.875rem;
+    }
+
+    .log-entry:last-child {
+        border-bottom: none;
+    }
+
+    .log-time {
+        color: #888;
+        margin-right: 1rem;
+    }
+
+    .management-section {
+        background: #1a1a1a;
+        border: 1px solid #2d2d2d;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+    <!-- Admin Header -->
+    <div class="admin-header">
+        <h2><i class="fas fa-user-shield"></i> System Management Console</h2>
+        <p class="mb-0">Monitor and manage CrypSync platform</p>
+    </div>
+
+    <!-- System Health -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="management-section">
+                <h5><i class="fas fa-heartbeat"></i> System Health</h5>
+                <div class="row mt-3">
+                    <div class="col-md-3">
+                        <div class="system-health-card">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="text-muted small">API Status</div>
+                                    <div class="h5 mb-0">Operational</div>
+                                </div>
+                                <i class="fas fa-check-circle fa-2x text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="system-health-card">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="text-muted small">Database</div>
+                                    <div class="h5 mb-0">Connected</div>
+                                </div>
+                                <i class="fas fa-database fa-2x text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="system-health-card warning">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="text-muted small">API Rate Limit</div>
+                                    <div class="h5 mb-0">45/50</div>
+                                </div>
+                                <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="system-health-card">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="text-muted small">Uptime</div>
+                                    <div class="h5 mb-0">99.9%</div>
+                                </div>
+                                <i class="fas fa-clock fa-2x text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="stat-label">Total Users</div>
+                    <div class="stat-value" id="totalUsers">0</div>
+                    <small class="text-muted">Registered accounts</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="stat-label">Total Transactions</div>
+                    <div class="stat-value" id="totalTransactions">0</div>
+                    <small class="text-muted">All-time trades</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="stat-label">Portfolio Value</div>
+                    <div class="stat-value" id="totalPortfolioValue">$0</div>
+                    <small class="text-muted">Combined holdings</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="stat-label">Active Alerts</div>
+                    <div class="stat-value" id="activeAlerts">0</div>
+                    <small class="text-muted">Price notifications</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Management Tabs -->
+    <ul class="nav nav-tabs mb-4" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" href="#usersTab">
+                <i class="fas fa-users"></i> User Management
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#coinsTab">
+                <i class="fas fa-coins"></i> Coin Management
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#activityTab">
+                <i class="fas fa-history"></i> Activity Logs
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#alertsTab">
+                <i class="fas fa-bell"></i> Active Alerts
+            </a>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+        <!-- Users Tab -->
+        <div class="tab-pane fade show active" id="usersTab">
+            <div class="management-section">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5><i class="fas fa-users"></i> Registered Users</h5>
+                    <div>
+                        <input type="text" class="form-control form-control-sm" placeholder="Search users..."
+                            id="userSearch">
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Registered</th>
+                                <th>Last Login</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTable">
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coins Tab -->
+        <div class="tab-pane fade" id="coinsTab">
+            <div class="management-section">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5><i class="fas fa-coins"></i> Tracked Cryptocurrencies</h5>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCoinModal">
+                        <i class="fas fa-plus"></i> Add Coin
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Coin ID</th>
+                                <th>Name</th>
+                                <th>Symbol</th>
+                                <th>Added Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="coinsTable">
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Logs Tab -->
+        <div class="tab-pane fade" id="activityTab">
+            <div class="management-section">
+                <h5><i class="fas fa-history"></i> Recent Transactions</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>User</th>
+                                <th>Type</th>
+                                <th>Crypto</th>
+                                <th>Amount</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsTable">
+                            <tr>
+                                <td colspan="7" class="text-center">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Alerts Tab -->
+        <div class="tab-pane fade" id="alertsTab">
+            <div class="management-section">
+                <h5><i class="fas fa-bell"></i> Active Price Alerts</h5>
+                <div class="activity-log" id="activeAlertsList">
+                    <div class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Coin Modal -->
+<div class="modal fade" id="addCoinModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Tracked Coin</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addCoinForm">
+                    <div class="mb-3">
+                        <label for="coinId" class="form-label">Coin ID (CoinGecko)</label>
+                        <input type="text" class="form-control" id="coinId" required placeholder="e.g., bitcoin">
+                        <small class="text-muted">Use CoinGecko API ID</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="coinName" class="form-label">Coin Name</label>
+                        <input type="text" class="form-control" id="coinName" required placeholder="e.g., Bitcoin">
+                    </div>
+                    <div class="mb-3">
+                        <label for="coinSymbol" class="form-label">Symbol</label>
+                        <input type="text" class="form-control" id="coinSymbol" required placeholder="e.g., BTC">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="addCoin()">Add Coin</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Load statistics
+    async function loadStatistics() {
+        try {
+            const response = await fetch('/api/admin/statistics');
+            const data = await response.json();
+
+            if (data.success) {
+                const stats = data.statistics;
+                document.getElementById('totalUsers').textContent = stats.total_users;
+                document.getElementById('totalTransactions').textContent = stats.total_transactions;
+                document.getElementById('totalPortfolioValue').textContent = '$' + stats.total_portfolio_value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                document.getElementById('activeAlerts').textContent = stats.active_alerts;
+            }
+        } catch (error) {
+            console.error('Failed to load statistics:', error);
+        }
+    }
+
+    // Load users
+    async function loadUsers() {
+        try {
+            const response = await fetch('/api/admin/users');
+            const data = await response.json();
+
+            if (data.success) {
+                const tbody = document.getElementById('usersTable');
+
+                if (data.users.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No users found</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = data.users.map(user => `
+                <tr>
+                    <td>${user.email}</td>
+                    <td><span class="badge bg-${user.role === 'admin' ? 'danger' : 'primary'}">${user.role}</span></td>
+                    <td>${new Date(user.created_at).toLocaleDateString()}</td>
+                    <td>${user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}</td>
+                    <td>
+                        ${user.role !== 'admin' ? `<button class="btn btn-sm btn-danger" onclick="deleteUser('${user.user_id}', '${user.email}')"><i class="fas fa-trash"></i></button>` : '<span class="text-muted">Protected</span>'}
+                    </td>
+                </tr>
+            `).join('');
+            }
+        } catch (error) {
+            console.error('Failed to load users:', error);
+        }
+    }
+
+    // Load tracked coins
+    async function loadCoins() {
+        try {
+            const response = await fetch('/api/admin/coins');
+            const data = await response.json();
+
+            if (data.success) {
+                const tbody = document.getElementById('coinsTable');
+
+                if (data.coins.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No coins tracked</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = data.coins.map(coin => `
+                <tr>
+                    <td>${coin.coin_id}</td>
+                    <td>${coin.name}</td>
+                    <td><strong>${coin.symbol}</strong></td>
+                    <td>${new Date(coin.added_at).toLocaleDateString()}</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" onclick="removeCoin('${coin.coin_id}', '${coin.name}')">
+                            <i class="fas fa-trash"></i> Remove
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            }
+        } catch (error) {
+            console.error('Failed to load coins:', error);
+        }
+    }
+
+    // Load transactions
+    async function loadTransactions() {
+        try {
+            const response = await fetch('/api/admin/transactions?limit=50');
+            const data = await response.json();
+
+            if (data.success) {
+                const tbody = document.getElementById('transactionsTable');
+
+                if (data.transactions.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No transactions found</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = data.transactions.map(tx => `
+                <tr>
+                    <td>${tx.email}</td>
+                    <td><span class="badge bg-${tx.type === 'BUY' ? 'success' : 'danger'}">${tx.type}</span></td>
+                    <td>${tx.crypto_id.toUpperCase()}</td>
+                    <td>${tx.amount}</td>
+                    <td>$${tx.price_usd.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                    <td>$${tx.total_usd.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                    <td>${new Date(tx.timestamp).toLocaleString()}</td>
+                </tr>
+            `).join('');
+            }
+        } catch (error) {
+            console.error('Failed to load transactions:', error);
+        }
+    }
+
+    // Add coin
+    async function addCoin() {
+        const coinId = document.getElementById('coinId').value;
+        const coinName = document.getElementById('coinName').value;
+        const coinSymbol = document.getElementById('coinSymbol').value;
+
+        if (!coinId || !coinName || !coinSymbol) {
+            alert('Please fill all fields');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/admin/coins/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    coin_id: coinId,
+                    name: coinName,
+                    symbol: coinSymbol
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert(data.message);
+                document.getElementById('addCoinForm').reset();
+                bootstrap.Modal.getInstance(document.getElementById('addCoinModal')).hide();
+                loadCoins();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        } catch (error) {
+            alert('Failed to add coin');
+        }
+    }
+
+    // Remove coin
+    async function removeCoin(coinId, coinName) {
+        if (!confirm(`Are you sure you want to remove ${coinName} from tracking?`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/admin/coins/remove', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ coin_id: coinId })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert(data.message);
+                loadCoins();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        } catch (error) {
+            alert('Failed to remove coin');
+        }
+    }
+
+    // Delete user
+    async function deleteUser(userId, email) {
+        if (!confirm(`Are you sure you want to delete user ${email}? This will delete all their data.`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/admin/users/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert(data.message);
+                loadUsers();
+                loadStatistics();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        } catch (error) {
+            alert('Failed to delete user');
+        }
+    }
+
+    // Initial load
+    loadStatistics();
+    loadUsers();
+    loadCoins();
+    loadTransactions();
+
+    // Auto-refresh every 30 seconds
+    setInterval(() => {
+        loadStatistics();
+        loadUsers();
+        loadTransactions();
+    }, 30000);
+</script>
+{% endblock %}

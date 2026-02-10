@@ -1,0 +1,449 @@
+{% extends "base.html" %}
+
+{% block title %}Analyst Dashboard - CrypSync{% endblock %}
+
+{% block extra_css %}
+<style>
+    .analyst-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        color: white;
+    }
+
+    .comparison-card {
+        background: #1a1a1a;
+        border: 1px solid #2d2d2d;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .date-picker-group {
+        background: #0d0d0d;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+
+    .coin-selector {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .coin-chip {
+        background: #2d2d2d;
+        border: 2px solid #3d3d3d;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .coin-chip:hover {
+        border-color: #f3a033;
+    }
+
+    .coin-chip.selected {
+        background: #f3a033;
+        border-color: #f3a033;
+        color: #0d0d0d;
+        font-weight: bold;
+    }
+
+    .chart-container-analyst {
+        position: relative;
+        height: 400px;
+        margin-bottom: 2rem;
+    }
+
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .metric-card {
+        background: #1a1a1a;
+        border: 1px solid #2d2d2d;
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .metric-label {
+        font-size: 0.875rem;
+        color: #888;
+        margin-bottom: 0.5rem;
+    }
+
+    .metric-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #fff;
+    }
+
+    .metric-change {
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+    <!-- Analyst Header -->
+    <div class="analyst-header">
+        <h2><i class="fas fa-chart-bar"></i> Analyst Dashboard</h2>
+        <p class="mb-0">Advanced cryptocurrency research and comparison tools</p>
+    </div>
+
+    <!-- Date Range Selector -->
+    <div class="date-picker-group">
+        <div class="row">
+            <div class="col-md-3">
+                <label class="form-label">Start Date</label>
+                <input type="date" class="form-control" id="startDate">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">End Date</label>
+                <input type="date" class="form-control" id="endDate">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Quick Select</label>
+                <select class="form-control" id="quickSelect" onchange="applyQuickSelect()">
+                    <option value="">Custom Range</option>
+                    <option value="7">Last 7 Days</option>
+                    <option value="30" selected>Last 30 Days</option>
+                    <option value="90">Last 90 Days</option>
+                    <option value="180">Last 6 Months</option>
+                    <option value="365">Last Year</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button class="btn btn-primary w-100" onclick="updateComparison()">
+                    <i class="fas fa-sync-alt"></i> Update Analysis
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Coin Selector -->
+    <div class="comparison-card">
+        <h5><i class="fas fa-coins"></i> Select Cryptocurrencies to Compare</h5>
+        <div class="coin-selector" id="coinSelector">
+            <div class="coin-chip selected" data-coin="bitcoin">
+                <i class="fab fa-bitcoin"></i> Bitcoin
+            </div>
+            <div class="coin-chip selected" data-coin="ethereum">
+                <i class="fab fa-ethereum"></i> Ethereum
+            </div>
+            <div class="coin-chip" data-coin="cardano">
+                <i class="fas fa-circle"></i> Cardano
+            </div>
+            <div class="coin-chip" data-coin="solana">
+                <i class="fas fa-circle"></i> Solana
+            </div>
+            <div class="coin-chip" data-coin="ripple">
+                <i class="fas fa-circle"></i> Ripple
+            </div>
+            <div class="coin-chip" data-coin="polkadot">
+                <i class="fas fa-circle"></i> Polkadot
+            </div>
+            <div class="coin-chip" data-coin="dogecoin">
+                <i class="fab fa-dog"></i> Dogecoin
+            </div>
+            <div class="coin-chip" data-coin="avalanche-2">
+                <i class="fas fa-circle"></i> Avalanche
+            </div>
+        </div>
+    </div>
+
+    <!-- Comparative Metrics -->
+    <div class="comparison-card">
+        <h5><i class="fas fa-chart-line"></i> Comparative Metrics</h5>
+        <div class="metrics-grid" id="metricsGrid">
+            <div class="metric-card">
+                <div class="metric-label">Loading...</div>
+                <div class="metric-value">-</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Price Comparison Chart -->
+    <div class="comparison-card">
+        <h5><i class="fas fa-chart-area"></i> Price Comparison (Normalized to 100)</h5>
+        <div class="chart-container-analyst">
+            <canvas id="comparisonChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Volume Comparison Chart -->
+    <div class="comparison-card">
+        <h5><i class="fas fa-chart-bar"></i> Volume Comparison</h5>
+        <div class="chart-container-analyst">
+            <canvas id="volumeChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Correlation Matrix -->
+    <div class="comparison-card">
+        <h5><i class="fas fa-table"></i> Price Correlation Matrix</h5>
+        <div id="correlationMatrix" class="table-responsive">
+            <p class="text-muted text-center py-4">Select at least 2 cryptocurrencies to view correlation</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let comparisonChart = null;
+    let volumeChart = null;
+    let selectedCoins = ['bitcoin', 'ethereum'];
+
+    // Initialize date pickers
+    function initializeDates() {
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - 30);
+
+        document.getElementById('endDate').valueAsDate = endDate;
+        document.getElementById('startDate').valueAsDate = startDate;
+    }
+
+    // Quick select handler
+    function applyQuickSelect() {
+        const days = parseInt(document.getElementById('quickSelect').value);
+        if (!days) return;
+
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - days);
+
+        document.getElementById('endDate').valueAsDate = endDate;
+        document.getElementById('startDate').valueAsDate = startDate;
+    }
+
+    // Coin selector handler
+    document.getElementById('coinSelector').addEventListener('click', (e) => {
+        const chip = e.target.closest('.coin-chip');
+        if (!chip) return;
+
+        chip.classList.toggle('selected');
+        updateSelectedCoins();
+    });
+
+    function updateSelectedCoins() {
+        selectedCoins = Array.from(document.querySelectorAll('.coin-chip.selected'))
+            .map(chip => chip.dataset.coin);
+
+        if (selectedCoins.length > 0) {
+            updateComparison();
+        }
+    }
+
+    // Update comparison
+    async function updateComparison() {
+        if (selectedCoins.length === 0) {
+            alert('Please select at least one cryptocurrency');
+            return;
+        }
+
+        await Promise.all([
+            updateMetrics(),
+            updateComparisonChart(),
+            updateVolumeChart(),
+            updateCorrelationMatrix()
+        ]);
+    }
+
+    // Update metrics
+    async function updateMetrics() {
+        try {
+            const response = await fetch(`/api/prices?ids=${selectedCoins.join(',')}`);
+            const data = await response.json();
+
+            if (data.success) {
+                const metricsGrid = document.getElementById('metricsGrid');
+                metricsGrid.innerHTML = '';
+
+                selectedCoins.forEach(coinId => {
+                    const coinData = data.data[coinId];
+                    if (!coinData) return;
+
+                    const change24h = parseFloat(coinData.change_24h);
+                    const changeClass = change24h >= 0 ? 'positive' : 'negative';
+
+                    metricsGrid.innerHTML += `
+                        <div class="metric-card">
+                            <div class="metric-label">${coinId.toUpperCase()}</div>
+                            <div class="metric-value">$${parseFloat(coinData.price_usd).toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                            <div class="metric-change ${changeClass}">
+                                ${change24h >= 0 ? '▲' : '▼'} ${Math.abs(change24h).toFixed(2)}%
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        } catch (error) {
+            console.error('Failed to update metrics:', error);
+        }
+    }
+
+    // Update comparison chart
+    async function updateComparisonChart() {
+        const days = Math.floor((new Date(document.getElementById('endDate').value) -
+            new Date(document.getElementById('startDate').value)) / (1000 * 60 * 60 * 24));
+
+        try {
+            const datasets = [];
+            const colors = ['#f3a033', '#667eea', '#f093fb', '#4facfe', '#43e97b', '#fa709a'];
+
+            for (let i = 0; i < selectedCoins.length; i++) {
+                const coinId = selectedCoins[i];
+                const response = await fetch(`/api/historical?crypto_id=${coinId}&days=${days}`);
+                const data = await response.json();
+
+                if (data.success && data.data) {
+                    // Normalize to 100
+                    const prices = data.data.map(d => d.price_usd);
+                    const firstPrice = prices[0];
+                    const normalizedPrices = prices.map(p => (p / firstPrice) * 100);
+
+                    datasets.push({
+                        label: coinId.toUpperCase(),
+                        data: normalizedPrices,
+                        borderColor: colors[i % colors.length],
+                        backgroundColor: colors[i % colors.length] + '20',
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.4
+                    });
+                }
+            }
+
+            const ctx = document.getElementById('comparisonChart').getContext('2d');
+
+            if (comparisonChart) {
+                comparisonChart.destroy();
+            }
+
+            comparisonChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({ length: days }, (_, i) => i),
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: { color: '#fff' }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: '#2d2d2d' },
+                            ticks: { color: '#888' }
+                        },
+                        y: {
+                            grid: { color: '#2d2d2d' },
+                            ticks: { color: '#888' },
+                            title: {
+                                display: true,
+                                text: 'Normalized Price (Base = 100)',
+                                color: '#fff'
+                            }
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Failed to update comparison chart:', error);
+        }
+    }
+
+    // Update volume chart
+    async function updateVolumeChart() {
+        const ctx = document.getElementById('volumeChart').getContext('2d');
+
+        if (volumeChart) {
+            volumeChart.destroy();
+        }
+
+        // Placeholder for volume data
+        volumeChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: selectedCoins.map(c => c.toUpperCase()),
+                datasets: [{
+                    label: '24h Volume (USD)',
+                    data: selectedCoins.map(() => Math.random() * 1000000000),
+                    backgroundColor: '#f3a033'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        grid: { color: '#2d2d2d' },
+                        ticks: { color: '#888' }
+                    },
+                    y: {
+                        grid: { color: '#2d2d2d' },
+                        ticks: { color: '#888' }
+                    }
+                }
+            }
+        });
+    }
+
+    // Update correlation matrix
+    function updateCorrelationMatrix() {
+        if (selectedCoins.length < 2) {
+            document.getElementById('correlationMatrix').innerHTML =
+                '<p class="text-muted text-center py-4">Select at least 2 cryptocurrencies to view correlation</p>';
+            return;
+        }
+
+        // Placeholder correlation matrix
+        let html = '<table class="table table-bordered"><thead><tr><th></th>';
+        selectedCoins.forEach(coin => {
+            html += `<th>${coin.toUpperCase()}</th>`;
+        });
+        html += '</tr></thead><tbody>';
+
+        selectedCoins.forEach(coin1 => {
+            html += `<tr><th>${coin1.toUpperCase()}</th>`;
+            selectedCoins.forEach(coin2 => {
+                const correlation = coin1 === coin2 ? 1.00 : (Math.random() * 0.6 + 0.4).toFixed(2);
+                const colorClass = correlation > 0.7 ? 'text-success' : correlation > 0.4 ? 'text-warning' : 'text-danger';
+                html += `<td class="${colorClass}">${correlation}</td>`;
+            });
+            html += '</tr>';
+        });
+
+        html += '</tbody></table>';
+        document.getElementById('correlationMatrix').innerHTML = html;
+    }
+
+    // Initialize
+    initializeDates();
+    updateComparison();
+</script>
+{% endblock %}

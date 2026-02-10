@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - CrypSync{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+            <p class="text-muted">Your cryptocurrency portfolio overview</p>
+        </div>
+    </div>
+
+    <!-- Portfolio Summary -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="stat-label">Total Portfolio Value</div>
+                    <div class="stat-value" id="totalValue">$0.00</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="stat-label">Total Invested</div>
+                    <div class="stat-value" id="totalInvested">$0.00</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="stat-label">Profit/Loss</div>
+                    <div class="stat-value" id="profitLoss">$0.00</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Holdings -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-wallet"></i> Your Holdings
+                    <a href="/trading" class="btn btn-sm btn-primary float-end">
+                        <i class="fas fa-exchange-alt"></i> Trade
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div id="portfolioTable">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Market Prices -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-coins"></i> Market Prices
+                    <button class="btn btn-sm btn-light float-end" onclick="refreshData()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="pricesTable" class="table-responsive">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentPrices = {};
+
+    async function fetchPortfolio() {
+        try {
+            const response = await fetch('/api/portfolio');
+            const data = await response.json();
+
+            if (data.success) {
+                displayPortfolio(data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch portfolio:', error);
+        }
+    }
+
+    function displayPortfolio(data) {
+        const portfolio = data.portfolio || {};
+        const portfolioValue = data.portfolio_value || {};
+
+        // Update summary
+        if (portfolioValue.total_value !== undefined) {
+            document.getElementById('totalValue').textContent = `$${portfolioValue.total_value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+            let totalInvested = 0;
+            portfolioValue.holdings.forEach(h => totalInvested += h.total_invested);
+            document.getElementById('totalInvested').textContent = `$${totalInvested.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+            const profitLoss = portfolioValue.total_value - totalInvested;
+            const profitLossElement = document.getElementById('profitLoss');
+            profitLossElement.textContent = `$${profitLoss.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            profitLossElement.className = `stat-value ${profitLoss >= 0 ? 'text-success' : 'text-danger'}`;
+        }
+
+        // Display holdings
+        const container = document.getElementById('portfolioTable');
+
+        if (Object.keys(portfolio).length === 0) {
+            container.innerHTML = `
+            <div class="text-center py-5">
+                <i class="fas fa-wallet fa-3x text-muted mb-3"></i>
+                <p class="text-muted">You don't have any cryptocurrency holdings yet.</p>
+                <a href="/trading" class="btn btn-primary">
+                    <i class="fas fa-shopping-cart"></i> Start Trading
+                </a>
+            </div>
+        `;
+            return;
+        }
+
+        let html = `
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Cryptocurrency</th>
+                    <th>Amount</th>
+                    <th>Avg Price</th>
+                    <th>Current Price</th>
+                    <th>Current Value</th>
+                    <th>Profit/Loss</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+        if (portfolioValue.holdings) {
+            portfolioValue.holdings.forEach(holding => {
+                const profitLossClass = holding.profit_loss >= 0 ? 'positive' : 'negative';
+
+                html += `
+                <tr>
+                    <td><strong>${holding.crypto_id.toUpperCase()}</strong></td>
+                    <td>${holding.amount.toFixed(8)}</td>
+                    <td>$${holding.avg_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td>$${holding.current_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td>$${holding.current_value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td>
+                        <span class="price-change ${profitLossClass}">
+                            ${holding.profit_loss >= 0 ? '▲' : '▼'} $${Math.abs(holding.profit_loss).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            (${holding.profit_loss_pct.toFixed(2)}%)
+                        </span>
+                    </td>
+                </tr>
+            `;
+            });
+        }
+
+        html += `
+            </tbody>
+        </table>
+    `;
+
+        container.innerHTML = html;
+    }
+
+    async function fetchPrices() {
+        try {
+            const response = await fetch('/api/prices?ids=bitcoin,ethereum,cardano,solana,ripple');
+            const data = await response.json();
+
+            if (data.success) {
+                currentPrices = data.data;
+                displayPrices(data.data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch prices:', error);
+        }
+    }
+
+    function displayPrices(prices) {
+        const container = document.getElementById('pricesTable');
+
+        let html = `
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Cryptocurrency</th>
+                    <th>Price (USD)</th>
+                    <th>24h Change</th>
+                    <th>Last Updated</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+        for (const [cryptoId, priceData] of Object.entries(prices)) {
+            const change24h = parseFloat(priceData.change_24h);
+            const changeClass = change24h >= 0 ? 'positive' : 'negative';
+            const changeIcon = change24h >= 0 ? 'fa-arrow-up' : 'fa-arrow-down';
+
+            html += `
+            <tr>
+                <td><span class="coin-name">${cryptoId.toUpperCase()}</span></td>
+                <td><span class="price">$${parseFloat(priceData.price_usd).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span></td>
+                <td>
+                    <span class="price-change ${changeClass}">
+                        <i class="fas ${changeIcon}"></i> ${Math.abs(change24h).toFixed(2)}%
+                    </span>
+                </td>
+                <td><small class="text-muted">${new Date(priceData.fetched_at).toLocaleString()}</small></td>
+            </tr>
+        `;
+        }
+
+        html += `
+            </tbody>
+        </table>
+    `;
+
+        container.innerHTML = html;
+    }
+
+    function refreshData() {
+        fetchPortfolio();
+        fetchPrices();
+    }
+
+    // Initial load
+    fetchPortfolio();
+    fetchPrices();
+
+    // Auto-refresh every 60 seconds
+    setInterval(refreshData, 60000);
+</script>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% set hide_nav = true %}
+
+{% block title %}Login - CrypSync{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="card">
+            <div class="card-header text-center">
+                <h3><i class="fas fa-chart-line"></i> CrypSync</h3>
+                <p class="mb-0">Login to your account</p>
+            </div>
+            <div class="card-body">
+                <form id="loginForm">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Login As</label>
+                        <select class="form-control" id="role" required>
+                            <option value="user">User - Portfolio & Trading</option>
+                            <option value="analyst">Analyst - Research & Charts</option>
+                            <option value="admin">Admin - System Management</option>
+                        </select>
+                        <small class="text-muted">Select your role to access the appropriate dashboard</small>
+                    </div>
+                    <div id="errorMessage" class="alert alert-danger d-none"></div>
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                </form>
+                <div class="text-center mt-3">
+                    <p class="text-muted">Don't have an account? <a href="{{ url_for('register') }}"
+                            class="text-primary">Register</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/login.js') }}"></script>
+{% endblock %}

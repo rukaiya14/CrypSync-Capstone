@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block title %}About - CrypSync{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* About Page Specific Styles */
+    body {
+        background: #0d0d0d;
+        color: #ffffff;
+        font-family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    .about-hero {
+        text-align: center;
+        padding: 80px 20px 60px;
+        background: linear-gradient(180deg, #0d0d0d 0%, #1a1a1a 100%);
+    }
+
+    .about-hero h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        letter-spacing: -1px;
+        line-height: 1.1;
+        margin-bottom: 24px;
+        color: #ffffff;
+    }
+
+    .about-hero .subtitle {
+        font-size: 1.5rem;
+        color: #b0b0b0;
+        max-width: 800px;
+        margin: 0 auto;
+        line-height: 1.6;
+        font-weight: 400;
+    }
+
+    .benefits-section {
+        padding: 80px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .benefits-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 32px;
+        margin-top: 60px;
+    }
+
+    .benefit-card {
+        background: #1a1a1a;
+        border: 1px solid #2d2d2d;
+        border-radius: 24px;
+        padding: 40px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .benefit-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: #f3a033;
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
+    .benefit-card:hover {
+        transform: translateY(-8px);
+        border-color: #f3a033;
+        box-shadow: 0 20px 40px rgba(243, 160, 51, 0.15);
+    }
+
+    .benefit-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .benefit-icon {
+        width: 64px;
+        height: 64px;
+        background: rgba(243, 160, 51, 0.1);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+    }
+
+    .benefit-icon i {
+        font-size: 32px;
+        color: #f3a033;
+    }
+
+    .benefit-card h3 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        margin-bottom: 16px;
+        color: #ffffff;
+    }
+
+    .benefit-card p {
+        font-size: 1.125rem;
+        line-height: 1.7;
+        color: #b0b0b0;
+        margin: 0;
+    }
+
+    .mission-section {
+        background: #1a1a1a;
+        padding: 80px 20px;
+        margin: 60px 0;
+    }
+
+    .mission-content {
+        max-width: 900px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .mission-content h2 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        letter-spacing: -1px;
+        margin-bottom: 32px;
+        color: #ffffff;
+    }
+
+    .mission-content p {
+        font-size: 1.25rem;
+        line-height: 1.8;
+        color: #b0b0b0;
+        margin-bottom: 24px;
+    }
+
+    .trust-section {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 80px 20px;
+        text-align: center;
+    }
+
+    .trust-section h2 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        letter-spacing: -1px;
+        margin-bottom: 32px;
+        color: #ffffff;
+    }
+
+    .trust-content {
+        background: #1a1a1a;
+        border: 1px solid #2d2d2d;
+        border-radius: 24px;
+        padding: 48px;
+        font-size: 1.25rem;
+        line-height: 1.8;
+        color: #b0b0b0;
+    }
+
+    .cta-section {
+        text-align: center;
+        padding: 80px 20px 100px;
+    }
+
+    .cta-section h2 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        letter-spacing: -1px;
+        margin-bottom: 40px;
+        color: #ffffff;
+    }
+
+    .cta-buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-cta {
+        padding: 18px 48px;
+        font-size: 1.125rem;
+        font-weight: 600;
+        border-radius: 12px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .btn-primary-cta {
+        background: #f3a033;
+        color: #0d0d0d;
+        border: 2px solid #f3a033;
+    }
+
+    .btn-primary-cta:hover {
+        background: #ff9500;
+        border-color: #ff9500;
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(243, 160, 51, 0.3);
+        color: #0d0d0d;
+    }
+
+    .btn-secondary-cta {
+        background: transparent;
+        color: #f3a033;
+        border: 2px solid #f3a033;
+    }
+
+    .btn-secondary-cta:hover {
+        background: rgba(243, 160, 51, 0.1);
+        transform: translateY(-2px);
+        color: #f3a033;
+    }
+
+    @media (max-width: 768px) {
+        .about-hero h1 {
+            font-size: 2.5rem;
+        }
+
+        .about-hero .subtitle {
+            font-size: 1.25rem;
+        }
+
+        .benefits-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .benefit-card {
+            padding: 32px;
+        }
+
+        .mission-content h2,
+        .trust-section h2,
+        .cta-section h2 {
+            font-size: 2rem;
+        }
+
+        .trust-content {
+            padding: 32px;
+            font-size: 1.125rem;
+        }
+
+        .cta-buttons {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .btn-cta {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="about-hero">
+    <h1>The Only Platform to Track<br>Your Entire Crypto Journey</h1>
+    <p class="subtitle">Our mission is to make market insights simple, fast, and accessible for everyone.</p>
+</section>
+
+<!-- Benefits Section -->
+<section class="benefits-section">
+    <div class="benefits-grid">
+        <!-- Benefit 1 -->
+        <div class="benefit-card">
+            <div class="benefit-icon">
+                <i class="fas fa-bolt"></i>
+            </div>
+            <h3>Never Miss a Move</h3>
+            <p>Stay ahead with real-time price tracking across top cryptocurrencies. Get instant updates every 60
+                seconds and set custom alerts to catch opportunities the moment they happen.</p>
+        </div>
+
+        <!-- Benefit 2 -->
+        <div class="benefit-card">
+            <div class="benefit-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h3>Insightful Analysis</h3>
+            <p>Make informed decisions with interactive historical charts and trend analysis. Visualize price movements
+                over days, weeks, or months to understand market patterns.</p>
+        </div>
+
+        <!-- Benefit 3 -->
+        <div class="benefit-card">
+            <div class="benefit-icon">
+                <i class="fas fa-wallet"></i>
+            </div>
+            <h3>Smart Portfolio Management</h3>
+            <p>Track your holdings, monitor profit and loss in real-time, and get a complete view of your crypto
+                portfolio performance—all in one intuitive dashboard.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Mission Section -->
+<section class="mission-section">
+    <div class="mission-content">
+        <h2>Built for Traders, By Traders</h2>
+        <p>We understand the challenges of navigating the fast-paced crypto market. That's why we created CrypSync—a
+            platform that cuts through the noise and delivers the insights you need, when you need them.</p>
+        <p>Whether you're a seasoned investor or just starting your crypto journey, our tools are designed to help you
+            make confident, data-driven decisions without the complexity.</p>
+    </div>
+</section>
+
+<!-- Trust Section -->
+<section class="trust-section">
+    <h2>Your Trust, Our Priority</h2>
+    <div class="trust-content">
+        <p>At CrypSync, we're committed to transparency and data safety. Your information is protected with
+            industry-standard security measures, and we never share your data with third parties. We believe in
+            empowering you with the tools and insights you need while keeping your privacy intact.</p>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <h2>Ready to Take Control?</h2>
+    <div class="cta-buttons">
+        <a href="{{ url_for('register') }}" class="btn-cta btn-primary-cta">
+            <i class="fas fa-user-plus"></i> Get Started Free
+        </a>
+        <a href="{{ url_for('home') }}" class="btn-cta btn-secondary-cta">
+            <i class="fas fa-chart-line"></i> View Live Prices
+        </a>
+    </div>
+</section>
+{% endblock %}

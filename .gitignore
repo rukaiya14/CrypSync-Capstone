@@ -1,0 +1,9 @@
+# Ignore all Markdown files
+*.md
+
+# Do not ignore these specific files
+!README.md
+!README_AWS.md
+
+# Ignore the .kiro folder
+.kiro/

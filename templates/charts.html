@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Charts - CrypSync{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-gradient"><i class="fas fa-chart-line"></i> Price Charts</h2>
+            <p class="text-muted">Interactive cryptocurrency price charts</p>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <label for="cryptoSelect" class="form-label">Cryptocurrency</label>
+            <select class="form-control" id="cryptoSelect" onchange="loadHistoricalData()">
+                <option value="bitcoin">Bitcoin (BTC)</option>
+                <option value="ethereum">Ethereum (ETH)</option>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label for="daysSelect" class="form-label">Time Period</label>
+            <select class="form-control" id="daysSelect" onchange="loadHistoricalData()">
+                <option value="1">Last 24 Hours</option>
+                <option value="7" selected>Last 7 Days</option>
+                <option value="30">Last 30 Days</option>
+                <option value="90">Last 90 Days</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-chart-area"></i> Price Trend
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="priceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/historical.js') }}"></script>
+{% endblock %}

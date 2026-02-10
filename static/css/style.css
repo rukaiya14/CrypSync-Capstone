@@ -1,0 +1,1290 @@
+/* CrypSync - Dark Theme (CoinStats Style) */
+
+:root {
+    --primary-color: #ff9500;
+    --primary-hover: #ffaa33;
+    --success-color: #00d084;
+    --danger-color: #ff4757;
+    --warning-color: #ff9500;
+    --info-color: #4a90e2;
+    --dark-bg: #0a0a0a;
+    --card-bg: #1a1a1a;
+    --card-hover: #222222;
+    --text-primary: #ffffff;
+    --text-secondary: #8a8a8a;
+    --text-muted: #666666;
+    --border-color: #2a2a2a;
+    --border-radius: 0.75rem;
+    --transition-speed: 0.3s;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* Global Styles */
+body {
+    background: var(--dark-bg);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+/* Navbar - Dark Theme */
+.navbar {
+    background: var(--card-bg) !important;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--text-primary) !important;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.navbar-brand i {
+    color: var(--primary-color);
+}
+
+.navbar-nav .nav-link {
+    font-weight: 500;
+    color: var(--text-secondary) !important;
+    padding: 0.5rem 1rem;
+    margin: 0 0.25rem;
+    border-radius: var(--border-radius);
+    transition: all var(--transition-speed) ease;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+    background: rgba(255, 149, 0, 0.1);
+    color: var(--primary-color) !important;
+}
+
+.navbar-toggler {
+    border-color: var(--border-color);
+}
+
+.navbar-toggler-icon {
+    filter: invert(1);
+}
+
+/* Card - Dark Theme */
+.card {
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+    border-radius: var(--border-radius);
+    background: var(--card-bg);
+    transition: all var(--transition-speed) ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(255, 149, 0, 0.3);
+}
+
+.card-header {
+    background: var(--card-bg);
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 1rem 1.5rem;
+}
+
+.card-body {
+    padding: 1.5rem;
+    background: var(--card-bg);
+}
+
+/* Stat Cards */
+.stat-card {
+    text-align: center;
+    padding: 1.5rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    transition: all var(--transition-speed) ease;
+}
+
+.stat-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-4px);
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Table - Dark Theme */
+.table {
+    margin-bottom: 0;
+    color: var(--text-primary);
+}
+
+.table th {
+    border-top: none;
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    background-color: transparent;
+    padding: 1rem;
+}
+
+.table td {
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+.table-hover tbody tr {
+    transition: all var(--transition-speed) ease;
+    cursor: pointer;
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--card-hover);
+}
+
+/* Crypto Table Specific */
+.crypto-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.crypto-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--card-hover);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.crypto-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.crypto-symbol {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+/* Price Display - CoinStats Style */
+.price {
+    font-weight: 700;
+    font-size: 1.25rem;
+    font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+    color: var(--text-primary);
+}
+
+.price-change {
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.price-change.positive {
+    background-color: rgba(0, 208, 132, 0.15);
+    color: var(--success-color);
+}
+
+.price-change.negative {
+    background-color: rgba(255, 71, 87, 0.15);
+    color: var(--danger-color);
+}
+
+/* Market Cap Badge */
+.market-cap {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Volume Badge */
+.volume-24h {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Sparkline Chart */
+.sparkline {
+    width: 100px;
+    height: 40px;
+}
+
+.sparkline-positive {
+    color: var(--success-color);
+}
+
+.sparkline-negative {
+    color: var(--danger-color);
+}
+
+/* Coin Display */
+.coin-name {
+    font-weight: 600;
+    text-transform: capitalize;
+    font-size: 1.1rem;
+}
+
+.coin-symbol {
+    font-size: 0.875rem;
+    color: #6c757d;
+    text-transform: uppercase;
+}
+
+/* Alert Status Badge */
+.alert-status {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 2rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.alert-status.active {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: #fff;
+}
+
+.alert-status.triggered {
+    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+    color: #fff;
+}
+
+/* Price Alert Animations */
+.price-alert-high {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%) !important;
+    animation: pulse-green 2s infinite;
+}
+
+.price-alert-low {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%) !important;
+    animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-green {
+
+    0%,
+    100% {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+    }
+
+    50% {
+        background: linear-gradient(135deg, #c3e6cb 0%, #b1dfbb 100%);
+        box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+    }
+}
+
+@keyframes pulse-red {
+
+    0%,
+    100% {
+        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+    }
+
+    50% {
+        background: linear-gradient(135deg, #f5c6cb 0%, #f1b0b7 100%);
+        box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+    }
+}
+
+/* Button - Dark Theme with Orange Accent */
+.btn {
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    padding: 0.625rem 1.5rem;
+    transition: all var(--transition-speed) ease;
+    border: none;
+    font-size: 0.9375rem;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: #000;
+    box-shadow: 0 4px 12px rgba(255, 149, 0, 0.3);
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 149, 0, 0.4);
+    color: #000;
+}
+
+.btn-success {
+    background: var(--success-color);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 208, 132, 0.3);
+}
+
+.btn-success:hover {
+    background: #00b872;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 208, 132, 0.4);
+}
+
+.btn-danger {
+    background: var(--danger-color);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+}
+
+.btn-danger:hover {
+    background: #ff3545;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 71, 87, 0.4);
+}
+
+.btn-outline-primary {
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    background: transparent;
+}
+
+.btn-outline-primary:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #000;
+    transform: translateY(-2px);
+}
+
+.btn-light {
+    background: var(--card-hover);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-light:hover {
+    background: var(--border-color);
+    color: var(--text-primary);
+}
+
+/* Form - Dark Theme */
+.form-control {
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    padding: 0.75rem 1rem;
+    transition: all var(--transition-speed) ease;
+    background: var(--card-bg);
+    color: var(--text-primary);
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(255, 149, 0, 0.25);
+    background: var(--card-bg);
+    color: var(--text-primary);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.form-select {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(255, 149, 0, 0.25);
+}
+
+/* Loading States */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Modal - Dark Theme */
+.modal-content {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    background: var(--card-bg);
+}
+
+.modal-header {
+    background: var(--card-bg);
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.5rem;
+}
+
+.modal-header .btn-close {
+    filter: invert(1);
+}
+
+.modal-body {
+    background: var(--card-bg);
+    color: var(--text-primary);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border-color);
+    padding: 1rem 1.5rem;
+    background: var(--card-bg);
+}
+
+/* Alert - Dark Theme */
+.alert {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1rem 1.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.alert-info {
+    background: rgba(74, 144, 226, 0.15);
+    border-color: rgba(74, 144, 226, 0.3);
+    color: #4a90e2;
+}
+
+.alert-success {
+    background: rgba(0, 208, 132, 0.15);
+    border-color: rgba(0, 208, 132, 0.3);
+    color: var(--success-color);
+}
+
+.alert-danger {
+    background: rgba(255, 71, 87, 0.15);
+    border-color: rgba(255, 71, 87, 0.3);
+    color: var(--danger-color);
+}
+
+.alert-warning {
+    background: rgba(255, 149, 0, 0.15);
+    border-color: rgba(255, 149, 0, 0.3);
+    color: var(--primary-color);
+}
+
+/* Chart Container */
+.chart-container {
+    position: relative;
+    height: 400px;
+    padding: 1rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+
+    .btn-sm {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .chart-container {
+        height: 300px;
+    }
+}
+
+/* Utility Classes */
+.text-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.bg-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Auth Container - Dark Theme */
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: var(--dark-bg);
+}
+
+.auth-card {
+    max-width: 450px;
+    width: 100%;
+}
+
+.auth-card .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+}
+
+.auth-card .card-header {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.auth-card .card-body {
+    padding: 2.5rem;
+}
+
+.auth-card a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.auth-card a:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+/* Text Colors */
+.text-gradient {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.text-secondary {
+    color: var(--text-secondary) !important;
+}
+
+
+/* Loading States */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+}
+
+.spinner-border {
+    border-color: var(--primary-color);
+    border-right-color: transparent;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+
+    .btn-sm {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .chart-container {
+        height: 300px;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+    }
+}
+
+/* Utility Classes */
+.bg-dark-card {
+    background: var(--card-bg);
+}
+
+.border-dark {
+    border-color: var(--border-color) !important;
+}
+
+/* Scrollbar - Dark Theme */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--dark-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* Badge - Dark Theme */
+.badge {
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.badge.bg-success {
+    background: var(--success-color) !important;
+}
+
+.badge.bg-danger {
+    background: var(--danger-color) !important;
+}
+
+.badge.bg-warning {
+    background: var(--primary-color) !important;
+    color: #000 !important;
+}
+
+/* Container Adjustments */
+.container-fluid {
+    padding: 2rem;
+}
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 1rem;
+    }
+}
+
+/* Market Stats Section */
+.market-stats {
+    display: flex;
+    gap: 2rem;
+    padding: 2rem 0;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+}
+
+.market-stat-item {
+    flex: 1;
+}
+
+.market-stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.market-stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Crypto List Item */
+.crypto-list-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    transition: all var(--transition-speed) ease;
+}
+
+.crypto-list-item:hover {
+    background: var(--card-hover);
+}
+
+.crypto-rank {
+    width: 40px;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.crypto-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.crypto-price-info {
+    flex: 1;
+    text-align: right;
+}
+
+
+/* Hero Section */
+.hero-section {
+    padding: 3rem 0 2rem;
+}
+
+.hero-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Market Stats Grid */
+.market-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.market-stat-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    transition: all var(--transition-speed) ease;
+}
+
+.market-stat-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.market-stat-card .stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.market-stat-card .stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.market-stat-card .stat-change {
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.market-stat-card .stat-change.positive {
+    color: var(--success-color);
+}
+
+.market-stat-card .stat-change.negative {
+    color: var(--danger-color);
+}
+
+/* Crypto Tabs */
+.crypto-tabs {
+    display: flex;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+    border-bottom: 2px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tab-btn:hover {
+    color: var(--text-primary);
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+/* Search Container */
+.search-container {
+    position: relative;
+    max-width: 400px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.75rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    color: var(--text-primary);
+    font-size: 0.9375rem;
+    transition: all var(--transition-speed) ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.1);
+}
+
+.search-input::placeholder {
+    color: var(--text-muted);
+}
+
+/* Crypto Table - CSS Grid Layout for Perfect Alignment */
+.crypto-table-container {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+}
+
+.crypto-table {
+    display: grid;
+    width: 100%;
+    min-width: 1100px;
+}
+
+/* Define grid columns with fixed widths */
+.crypto-table thead,
+.crypto-table tbody,
+.crypto-table tr {
+    display: contents;
+}
+
+/* Grid template for all rows (header and data) - MUST BE IDENTICAL */
+.crypto-table>thead>tr,
+.crypto-table>tbody>tr {
+    display: grid;
+    grid-template-columns: 50px 60px 1fr 140px 110px 110px 140px 140px 140px;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    gap: 0;
+}
+
+.crypto-table thead tr {
+    position: sticky;
+    top: 0;
+    background: var(--card-bg);
+    z-index: 10;
+}
+
+.crypto-table thead th {
+    background: var(--card-bg);
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 1rem 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.crypto-table tbody td {
+    padding: 1rem 0.75rem;
+    vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.crypto-table tbody tr {
+    transition: background var(--transition-speed) ease;
+}
+
+.crypto-table tbody tr:hover {
+    background: var(--card-hover);
+}
+
+.crypto-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+/* Column-specific alignment - EXACT MATCH FOR HEADERS AND DATA */
+/* Column 1: Favorite Icon */
+.crypto-table th:nth-child(1),
+.crypto-table td:nth-child(1) {
+    text-align: center;
+    justify-self: center;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+/* Column 2: Rank */
+.crypto-table th:nth-child(2),
+.crypto-table td:nth-child(2) {
+    text-align: left;
+    justify-self: start;
+    padding-left: 0.75rem;
+}
+
+/* Column 3: Name */
+.crypto-table th:nth-child(3),
+.crypto-table td:nth-child(3) {
+    text-align: left;
+    justify-self: start;
+    padding-left: 0.75rem;
+    overflow: hidden;
+}
+
+/* Column 4: Price */
+.crypto-table th:nth-child(4),
+.crypto-table td:nth-child(4) {
+    text-align: right;
+    justify-self: end;
+    padding-right: 0.75rem;
+}
+
+/* Column 5: 24h % */
+.crypto-table th:nth-child(5),
+.crypto-table td:nth-child(5) {
+    text-align: right;
+    justify-self: end;
+    padding-right: 0.75rem;
+}
+
+/* Column 6: 7d % */
+.crypto-table th:nth-child(6),
+.crypto-table td:nth-child(6) {
+    text-align: right;
+    justify-self: end;
+    padding-right: 0.75rem;
+}
+
+/* Column 7: Market Cap */
+.crypto-table th:nth-child(7),
+.crypto-table td:nth-child(7) {
+    text-align: right;
+    justify-self: end;
+    padding-right: 0.75rem;
+}
+
+/* Column 8: Volume */
+.crypto-table th:nth-child(8),
+.crypto-table td:nth-child(8) {
+    text-align: right;
+    justify-self: end;
+    padding-right: 0.75rem;
+}
+
+/* Column 9: Chart */
+.crypto-table th:nth-child(9),
+.crypto-table td:nth-child(9) {
+    text-align: center;
+    justify-self: center;
+    padding-right: 0.75rem;
+}
+
+/* Crypto Row Elements */
+.crypto-rank {
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.crypto-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    overflow: hidden;
+}
+
+.crypto-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.crypto-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.9375rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.crypto-symbol {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* Price Display */
+.price {
+    font-weight: 600;
+    font-size: 1rem;
+    font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+    color: var(--text-primary);
+    text-align: right;
+}
+
+.market-cap,
+.volume-24h {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-align: right;
+}
+
+/* Favorite Icon */
+.favorite-icon {
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+    font-size: 1.125rem;
+}
+
+.favorite-icon:hover {
+    color: var(--primary-color);
+    transform: scale(1.2);
+}
+
+.favorite-icon.favorited {
+    color: var(--primary-color);
+}
+
+/* Sparkline Canvas */
+.sparkline {
+    display: block;
+}
+
+/* Pagination */
+.pagination-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem 0;
+}
+
+.page-numbers {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.page-number {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+}
+
+.page-number:hover {
+    background: var(--card-hover);
+    color: var(--text-primary);
+}
+
+.page-number.active {
+    background: var(--primary-color);
+    color: #000;
+}
+
+.page-dots {
+    color: var(--text-muted);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-secondary);
+}
+
+.empty-state i {
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1200px) {
+
+    /* Adjust grid for medium screens - hide Volume and Chart */
+    .crypto-table>thead>tr,
+    .crypto-table>tbody>tr {
+        grid-template-columns: 50px 60px 1fr 140px 110px 110px 140px;
+    }
+
+    .crypto-table th:nth-child(8),
+    .crypto-table td:nth-child(8),
+    .crypto-table th:nth-child(9),
+    .crypto-table td:nth-child(9) {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 1.75rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+
+    .market-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .crypto-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-bottom: none;
+        margin-bottom: 1rem;
+    }
+
+    .tab-btn {
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        white-space: nowrap;
+    }
+
+    .search-container {
+        max-width: 100%;
+        margin-top: 1rem;
+    }
+
+    .d-flex.justify-content-between {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    /* Simplified grid for mobile - show only essential columns */
+    .crypto-table>thead>tr,
+    .crypto-table>tbody>tr {
+        grid-template-columns: 40px 50px 1fr 100px 90px;
+    }
+
+    .crypto-table th:nth-child(6),
+    .crypto-table td:nth-child(6),
+    .crypto-table th:nth-child(7),
+    .crypto-table td:nth-child(7),
+    .crypto-table th:nth-child(8),
+    .crypto-table td:nth-child(8),
+    .crypto-table th:nth-child(9),
+    .crypto-table td:nth-child(9) {
+        display: none;
+    }
+
+    .crypto-info {
+        gap: 0.5rem;
+    }
+
+    .crypto-icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    .crypto-name {
+        font-size: 0.875rem;
+    }
+
+    .crypto-symbol {
+        font-size: 0.75rem;
+    }
+
+    .pagination-container {
+        flex-direction: row;
+        gap: 1rem;
+    }
+
+    .btn {
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+    }
+}

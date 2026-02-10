@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block title %}Trading - CrypSync{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2><i class="fas fa-exchange-alt"></i> Trading</h2>
+            <p class="text-muted">Buy and sell cryptocurrencies</p>
+        </div>
+    </div>
+
+    <!-- Trading Interface -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#buyTab">Buy</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#sellTab">Sell</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content">
+                        <!-- Buy Tab -->
+                        <div class="tab-pane fade show active" id="buyTab">
+                            <form id="buyForm">
+                                <div class="mb-3">
+                                    <label for="buyCrypto" class="form-label">Cryptocurrency</label>
+                                    <select class="form-control" id="buyCrypto" required>
+                                        <option value="bitcoin">Bitcoin (BTC)</option>
+                                        <option value="ethereum">Ethereum (ETH)</option>
+                                        <option value="cardano">Cardano (ADA)</option>
+                                        <option value="solana">Solana (SOL)</option>
+                                        <option value="ripple">Ripple (XRP)</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="buyAmount" class="form-label">Amount</label>
+                                    <input type="number" class="form-control" id="buyAmount" step="0.00000001"
+                                        min="0.00000001" required>
+                                    <small class="text-muted">Current Price: <span
+                                            id="buyPrice">Loading...</span></small>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Total Cost (USD)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="text" class="form-control" id="buyTotal" readonly>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="fas fa-shopping-cart"></i> Buy Cryptocurrency
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Sell Tab -->
+                        <div class="tab-pane fade" id="sellTab">
+                            <form id="sellForm">
+                                <div class="mb-3">
+                                    <label for="sellCrypto" class="form-label">Cryptocurrency</label>
+                                    <select class="form-control" id="sellCrypto" required>
+                                        <option value="bitcoin">Bitcoin (BTC)</option>
+                                        <option value="ethereum">Ethereum (ETH)</option>
+                                        <option value="cardano">Cardano (ADA)</option>
+                                        <option value="solana">Solana (SOL)</option>
+                                        <option value="ripple">Ripple (XRP)</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="sellAmount" class="form-label">Amount</label>
+                                    <input type="number" class="form-control" id="sellAmount" step="0.00000001"
+                                        min="0.00000001" required>
+                                    <small class="text-muted">Current Price: <span id="sellPrice">Loading...</span> |
+                                        Available: <span id="sellAvailable">0</span></small>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Total Received (USD)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="text" class="form-control" id="sellTotal" readonly>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-danger w-100">
+                                    <i class="fas fa-hand-holding-usd"></i> Sell Cryptocurrency
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-history"></i> Recent Transactions
+                </div>
+                <div class="card-body" id="recentTransactions">
+                    <div class="text-center py-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentPrices = {};
+
+    // Fetch current prices
+    async function fetchPrices() {
+        try {
+            const response = await fetch('/api/prices?ids=bitcoin,ethereum,cardano,solana,ripple');
+            const data = await response.json();
+            if (data.success) {
+                currentPrices = data.data;
+                updatePriceDisplays();
+            }
+        } catch (error) {
+            console.error('Failed to fetch prices:', error);
+        }
+    }
+
+    function updatePriceDisplays() {
+        const buyCrypto = document.getElementById('buyCrypto').value;
+        const sellCrypto = document.getElementById('sellCrypto').value;
+
+        if (currentPrices[buyCrypto]) {
+            document.getElementById('buyPrice').textContent = `$${parseFloat(currentPrices[buyCrypto].price_usd).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+
+        if (currentPrices[sellCrypto]) {
+            document.getElementById('sellPrice').textContent = `$${parseFloat(currentPrices[sellCrypto].price_usd).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+
+        calculateTotals();
+    }
+
+    function calculateTotals() {
+        const buyAmount = parseFloat(document.getElementById('buyAmount').value) || 0;
+        const buyCrypto = document.getElementById('buyCrypto').value;
+        if (currentPrices[buyCrypto]) {
+            const buyTotal = buyAmount * parseFloat(currentPrices[buyCrypto].price_usd);
+            document.getElementById('buyTotal').value = buyTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        const sellAmount = parseFloat(document.getElementById('sellAmount').value) || 0;
+        const sellCrypto = document.getElementById('sellCrypto').value;
+        if (currentPrices[sellCrypto]) {
+            const sellTotal = sellAmount * parseFloat(currentPrices[sellCrypto].price_usd);
+            document.getElementById('sellTotal').value = sellTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+    }
+
+    // Buy form submission
+    document.getElementById('buyForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const crypto_id = document.getElementById('buyCrypto').value;
+        const amount = parseFloat(document.getElementById('buyAmount').value);
+
+        try {
+            const response = await fetch('/api/portfolio/buy', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ crypto_id, amount })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert(`Successfully bought ${amount} ${crypto_id.toUpperCase()}!\nEmail notification sent.`);
+                document.getElementById('buyForm').reset();
+                fetchTransactions();
+            } else {
+                alert(`Error: ${data.message}`);
+            }
+        } catch (error) {
+            alert('An error occurred while processing your order');
+        }
+    });
+
+    // Sell form submission
+    document.getElementById('sellForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const crypto_id = document.getElementById('sellCrypto').value;
+        const amount = parseFloat(document.getElementById('sellAmount').value);
+
+        try {
+            const response = await fetch('/api/portfolio/sell', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ crypto_id, amount })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert(`Successfully sold ${amount} ${crypto_id.toUpperCase()}!\nEmail notification sent.`);
+                document.getElementById('sellForm').reset();
+                fetchTransactions();
+            } else {
+                alert(`Error: ${data.message}`);
+            }
+        } catch (error) {
+            alert('An error occurred while processing your order');
+        }
+    });
+
+    // Fetch recent transactions
+    async function fetchTransactions() {
+        try {
+            const response = await fetch('/api/portfolio/transactions?limit=10');
+            const data = await response.json();
+
+            if (data.success && data.transactions.length > 0) {
+                let html = '<div class="list-group">';
+                data.transactions.forEach(tx => {
+                    const typeClass = tx.type === 'BUY' ? 'success' : 'danger';
+                    html += `
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between">
+                            <span class="badge bg-${typeClass}">${tx.type}</span>
+                            <small class="text-muted">${new Date(tx.timestamp).toLocaleDateString()}</small>
+                        </div>
+                        <div class="mt-2">
+                            <strong>${tx.amount} ${tx.crypto_id.toUpperCase()}</strong>
+                            <br>
+                            <small>@ $${tx.price_usd.toLocaleString('en-US', { minimumFractionDigits: 2 })}</small>
+                        </div>
+                    </div>
+                `;
+                });
+                html += '</div>';
+                document.getElementById('recentTransactions').innerHTML = html;
+            } else {
+                document.getElementById('recentTransactions').innerHTML = '<p class="text-muted text-center">No transactions yet</p>';
+            }
+        } catch (error) {
+            console.error('Failed to fetch transactions:', error);
+        }
+    }
+
+    // Event listeners
+    document.getElementById('buyCrypto').addEventListener('change', updatePriceDisplays);
+    document.getElementById('sellCrypto').addEventListener('change', updatePriceDisplays);
+    document.getElementById('buyAmount').addEventListener('input', calculateTotals);
+    document.getElementById('sellAmount').addEventListener('input', calculateTotals);
+
+    // Initial load
+    fetchPrices();
+    fetchTransactions();
+    setInterval(fetchPrices, 60000); // Update prices every minute
+</script>
+{% endblock %}
