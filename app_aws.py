@@ -123,7 +123,13 @@ def logout():
 @application.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html')
+    try:
+        return render_template('dashboard.html')
+    except Exception as e:
+        print(f"Dashboard error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
 
 @application.route('/api/prices')
 @login_required
@@ -204,7 +210,10 @@ def not_found(error):
 
 @application.errorhandler(500)
 def internal_error(error):
-    return jsonify({'error': 'Internal server error'}), 500
+    import traceback
+    print("500 Error occurred:")
+    print(traceback.format_exc())
+    return jsonify({'error': 'Internal server error', 'details': str(error)}), 500
 
 if __name__ == '__main__':
-    application.run(debug=False, host='0.0.0.0', port=5000)
+    application.run(debug=True, host='0.0.0.0', port=5000)
