@@ -194,9 +194,39 @@ def charts():
 def about():
     return render_template('about.html')
 
+@application.route('/portfolio')
+@login_required
+def portfolio():
+    return render_template('portfolio.html')
+
+@application.route('/trading')
+@login_required
+def trading():
+    return render_template('trading.html')
+
+@application.route('/watchlist')
+@login_required
+def watchlist():
+    return render_template('watchlist.html')
+
+@application.route('/alerts')
+@login_required
+def alerts():
+    return render_template('alerts.html')
+
+@application.route('/historical')
+@login_required
+def historical():
+    return render_template('historical.html')
+
+@application.route('/analyst')
+@login_required
+def analyst_dashboard():
+    return render_template('analyst_dashboard.html')
+
 @application.route('/admin')
 @login_required
-def admin():
+def admin_dashboard():
     return render_template('admin_dashboard.html')
 
 @application.route('/health')
