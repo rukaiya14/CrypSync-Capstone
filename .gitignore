@@ -1,0 +1,38 @@
+# Ignore all Markdown files
+*.md
+
+# Do not ignore these specific files
+!README.md
+!README_AWS.md
+
+# Ignore the .kiro folder
+.kiro/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment variables
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
