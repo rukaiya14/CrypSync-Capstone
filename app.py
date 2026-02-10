@@ -23,6 +23,7 @@ from services.historical_service import HistoricalService
 from services.visualization_service import VisualizationService
 from services.portfolio_service_db import PortfolioService
 from services.admin_service import AdminService
+from services.system_service import SystemService
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -36,6 +37,7 @@ historical_service = HistoricalService()
 visualization_service = VisualizationService()
 portfolio_service = PortfolioService()
 admin_service = AdminService()
+system_service = SystemService()
 
 # Mock notification service for local development
 class MockNotificationService:
@@ -379,6 +381,19 @@ def get_all_transactions():
 def delete_user():
     data = request.get_json()
     result = admin_service.delete_user(data['user_id'])
+    return jsonify(result)
+
+# System Status API endpoints
+@app.route('/api/system/status', methods=['GET'])
+@login_required
+def get_system_status():
+    result = system_service.get_system_status()
+    return jsonify(result)
+
+@app.route('/api/system/api-status', methods=['GET'])
+@login_required
+def get_api_status():
+    result = system_service.get_api_status()
     return jsonify(result)
 
 # Error handlers
