@@ -414,26 +414,46 @@ def admin_dashboard():
 @application.route('/api/admin/stats')
 @login_required
 def admin_stats():
-    result = admin_service.get_dashboard_stats()
-    return jsonify(result)
+    try:
+        result = admin_service.get_dashboard_stats()
+        print(f"Admin stats result: {result}")
+        return jsonify(result)
+    except Exception as e:
+        print(f"Admin stats error: {e}")
+        import traceback; traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)})
 
 @application.route('/api/admin/users')
 @login_required
 def admin_users():
-    result = admin_service.get_all_users()
-    return jsonify(result)
+    try:
+        result = admin_service.get_all_users()
+        print(f"Admin users result: {result}")
+        return jsonify(result)
+    except Exception as e:
+        print(f"Admin users error: {e}")
+        return jsonify({'success': False, 'error': str(e)})
 
 @application.route('/api/admin/transactions')
 @login_required
 def admin_transactions():
-    result = admin_service.get_all_transactions()
-    return jsonify(result)
+    try:
+        result = admin_service.get_all_transactions()
+        print(f"Admin transactions count: {len(result.get('transactions', []))}")
+        return jsonify(result)
+    except Exception as e:
+        print(f"Admin transactions error: {e}")
+        return jsonify({'success': False, 'error': str(e)})
 
 @application.route('/api/admin/alerts')
 @login_required
 def admin_alerts_list():
-    result = admin_service.get_all_alerts()
-    return jsonify(result)
+    try:
+        result = admin_service.get_all_alerts()
+        return jsonify(result)
+    except Exception as e:
+        print(f"Admin alerts error: {e}")
+        return jsonify({'success': False, 'error': str(e)})
 
 @application.route('/health')
 def health():
